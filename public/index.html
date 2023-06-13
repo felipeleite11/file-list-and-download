@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Robot Backups</title>
+
+	<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+	<script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/date-fns/1.30.1/date_fns.js"></script>
+
+	<link rel="shortcut icon" href="#">
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@500&display=swap" rel="stylesheet">
+
+	<style>
+		body {
+			background-color: #263238;
+			color: #fff;
+			font-family: 'Open Sans';
+		}
+
+		h1 {
+			font-family: 'Open Sans';
+		}
+
+		a {
+			color: #fff;
+		}
+
+		table th, 
+		table td {
+			border: solid 1px #fff;
+			padding: 8px;
+		}
+
+		table th {
+			font-weight: bold;
+		}
+	</style>
+</head>
+<body>
+	<h1>BACKUPS</h1>
+
+	<table>
+		<thead>
+			<tr>
+				<th>Arquivo de backup</th>
+				<th>Data de criação</th>
+			</tr>
+		</thead>
+		<tbody id="paths">
+
+		</tbody>
+	</table>
+
+	<script>
+		const basepath = 'backups'
+		const paths = $('#paths')
+
+		async function load() {
+			const { data } = await axios('/list')
+
+			for(const item of data) {
+				try {
+					const dateTimeString = item.match(/\d{4}-\d{2}-\d{2}_\d{2}-\d{2}/g)[0]
+					let [dateStr, timeStr] = dateTimeString.split('_')
+					timeStr = timeStr.replace('-', ':')
+					const date = new Date(`${dateStr} ${timeStr}`)
+
+					const li = `<tr>
+							<td><a href="${basepath}/${item}" target="_blank">${item}</a></td>
+							<td>${dateFns.format(date, 'DD/MM/YYYY HH:mm')}h</td>
+						</tr>`
+
+					paths.append(li)
+				} catch(e) {
+					continue
+				}
+			}
+		}
+
+		load()
+	</script>
+</body>
+</html>
